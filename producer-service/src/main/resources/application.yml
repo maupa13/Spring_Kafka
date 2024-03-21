@@ -1,0 +1,37 @@
+# Server properties
+server:
+  port: 8082
+
+# Spring Properties
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      bootstrap-servers: localhost:9092
+      client-id: producer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      sasl:
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
+        mechanism: PLAIN
+      security:
+        protocol: SASL_PLAINTEXT
+      spring:
+        json:
+          type:
+            mapping: Metric:com.stepup.producer.model.Metric
+    jaas:
+      enabled: true
+
+# Swagger properties
+springdoc:
+  show-actuator: true
+
+# Management properties
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

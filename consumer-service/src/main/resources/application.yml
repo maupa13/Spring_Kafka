@@ -1,0 +1,42 @@
+# Server properties
+server:
+  port: 8081
+
+# Spring Properties
+spring:
+  kafka:
+    consumer:
+      client-id: consumer
+      bootstrap-servers: localhost:9092
+      group-id: consumer-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "*"
+    jaas:
+      enabled: true
+    properties:
+      sasl:
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin-secret";
+        mechanism: PLAIN
+      security:
+        protocol: SASL_PLAINTEXT
+      jaas:
+        enabled: true
+      spring:
+        json:
+          type:
+            mapping: Metric:com.stepup.consumer.model.Metric
+
+# Swagger properties
+springdoc:
+  show-actuator: true
+
+# Management properties
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
