@@ -1,4 +1,4 @@
-package com.stepup.producer.model;
+package com.stepup.consumer.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 /**
- * The {@code Metric} class represents a metric model in the StepUp application.
+ * The {@code MetricDto} class represents a metric model in the Spring_Kafka application.
  * Metrics are identified by their {@code id} and contain a {@code value}
  * and contain a {@code name} and the {@code Instant} when they were last updated.
  */
@@ -21,12 +21,12 @@ import java.time.Instant;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Metric implements Serializable {
+public class MetricDto implements Serializable {
 
     /**
      * The id of the metric.
      */
-    private String id;
+    private Long id;
 
     /**
      * The name of the metric.

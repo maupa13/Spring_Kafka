@@ -29,11 +29,20 @@ spring:
       spring:
         json:
           type:
-            mapping: Metric:com.stepup.consumer.model.Metric
+            mapping: MetricDto:com.stepup.consumer.model.MetricDto, Metric:com.stepup.consumer.entity.Metric
+  datasource:
+    url: jdbc:postgresql://db:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
 
 # Management properties
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: "*"

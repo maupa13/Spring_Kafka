@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * The {@code MetricListenerTest} class contains unit tests for the {@code MetricListener} class.
  */
 @SpringBootTest
-class MetricProducerTest {
+class MetricDtoProducerTest {
 
     @Test
     void contextLoads() {

@@ -1,6 +1,6 @@
 package com.stepup.consumer.kafka;
 
-import com.stepup.consumer.model.Metric;
+import com.stepup.consumer.model.MetricDto;
 import com.stepup.common.KafkaHeaders;
 import com.stepup.common.KafkaTopics;
 import com.stepup.consumer.service.MetricService;
@@ -23,21 +23,20 @@ public class MetricListener {
     private final MetricService service;
 
     /**
-     * Listens to messages from the Kafka metrics topic and processes them based on the operation specified
-     * in the CONSUMER_OPERATION header.
+     * Listens to messages from the Kafka metrics topic and processes
+     * them based on the operation specified in the CONSUMER_OPERATION header.
      *
-     * @param metric    The metric received from Kafka.
+     * @param metricDto The metricDto received from Kafka.
      * @param operation The operation specified in the CONSUMER_OPERATION header.
      */
     @KafkaListener(topics = KafkaTopics.METRICS_TOPIC)
     public void listen(
-            @Payload Metric metric,
+            @Payload MetricDto metricDto,
             @Header(KafkaHeaders.CONSUMER_OPERATION) String operation) {
-        switch (operation) {
-            case "update" -> service.update(metric);
-            case "delete" -> service.delete(metric);
-            case "insert" -> service.insert(metric);
-            default -> log.warn("MetricListener.listen has a invalid CONSUMER_OPERATION header " + operation);
+        if ("insert".equals(operation)) {
+            service.insert(metricDto);
+        } else {
+            log.warn("MetricListener.listen has a invalid CONSUMER_OPERATION header " + operation);
         }
     }
 }

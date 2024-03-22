@@ -1,6 +1,6 @@
 package com.stepup.producer.kafka;
 
-import com.stepup.producer.model.Metric;
+import com.stepup.producer.model.MetricDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.metrics.MetricsEndpoint;
@@ -12,11 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
- * A scheduled producer component responsible for fetching metrics from the MetricsEndpoint
- * and inserting them into a metric producer.
+ * A scheduled producer component responsible for fetching metrics
+ * from actuator and inserting them into a metric producer.
  */
 @Component
 @AllArgsConstructor
@@ -52,7 +51,7 @@ public class ScheduledMetricActuatorProducer {
     private Object getValueFromMetric(String metricName) {
         MetricsEndpoint.MetricDescriptor metricDescriptor = metricsEndpoint.metric(metricName, null);
         if (metricDescriptor == null) {
-            log.warn("Metric descriptor for {} is null", metricName);
+            log.warn("MetricDto descriptor for {} is null", metricName);
             return null;
         }
 
@@ -74,27 +73,26 @@ public class ScheduledMetricActuatorProducer {
     private void insertMetrics(Map<String, Object> metricMap) {
         metricMap.forEach((name, value) -> {
             if (value != null) {
-                log.info("Metric name: {}, Value: {}", name, value);
-                Metric metric = new Metric();
-                metric.setId(UUID.randomUUID().toString());
-                metric.setName(name);
-                metric.setValue(value.toString());
-                metric.setUpdated(Instant.now());
-                insertMetricInProducer(metric);
+                log.info("MetricDto name: {}, Value: {}", name, value);
+                MetricDto metricDto = new MetricDto();
+                metricDto.setName(name);
+                metricDto.setValue(value.toString());
+                metricDto.setUpdated(Instant.now());
+                insertMetricInProducer(metricDto);
             }
         });
     }
 
     /**
-     * Inserts a metric into the metric producer.
+     * Inserts a metricDto into the metricDto producer.
      *
-     * @param metric The metric to insert.
+     * @param metricDto The metricDto to insert.
      */
-    private void insertMetricInProducer(Metric metric) {
+    private void insertMetricInProducer(MetricDto metricDto) {
         try {
-            metricProducer.insert(metric);
+            metricProducer.insert(metricDto);
         } catch (Exception e) {
-            log.error("Error inserting metric {}: {}", metric.getName(), e.getMessage(), e);
+            log.error("Error inserting metricDto {}: {}", metricDto.getName(), e.getMessage(), e);
             e.printStackTrace();
         }
     }
