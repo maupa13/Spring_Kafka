@@ -21,7 +21,7 @@ spring:
       spring:
         json:
           type:
-            mapping: Metric:com.stepup.producer.model.Metric
+            mapping: MetricDto:com.stepup.producer.model.MetricDto
     jaas:
       enabled: true
 
@@ -34,4 +34,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: "*"

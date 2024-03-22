@@ -1,5 +1,6 @@
 # The docker-compose.yml file defines a Docker Compose configuration for setting up
-# a Zookeeper instance, a Kafka broker, and two Spring Boot services for the StepUp application.
+# a Zookeeper instance, a Kafka broker, Postgres database,
+# two Spring Boot services, network for the Spring_Kafka application.
 
 version: '3.8'
 
@@ -48,7 +49,14 @@ services:
       SPRING_PROFILES_ACTIVE: container
       SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_KAFKA_PRODUCER_KEY_SERIALIZER: org.apache.kafka.common.serialization.StringSerializer
-      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: org.apache.kafka.common.serialization.StringSerializer
+      #
+      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: org.springframework.kafka.support.serializer.JsonSerializer
+      #
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: db
     ports:
       - 8081:8081
     depends_on:
@@ -69,6 +77,19 @@ services:
     depends_on:
       - zookeeper
       - kafka
+    networks:
+      - proxy.network
+
+  # Database
+  db:
+    container_name: db
+    image: 'postgres:13.1-alpine'
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     networks:
       - proxy.network
 

@@ -1,15 +1,18 @@
 package com.stepup.consumer.service;
 
-import com.stepup.consumer.model.Metric;
+import com.stepup.consumer.entity.Metric;
+import com.stepup.consumer.exception.MetricServiceException;
+import com.stepup.consumer.model.MetricDto;
+import com.stepup.consumer.repository.MetricRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The {@code MetricService} class is a Spring service component
@@ -20,15 +23,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class MetricService {
 
-    private final ConcurrentHashMap<String, Metric> map;
+    private final MetricRepository metricRepository;
 
     /**
-     * Retrieves all metrics stored in the ConcurrentHashMap.
+     * Retrieves all metrics stored in the MetricRepository.
      *
      * @return A collection of all metrics.
      */
-    public Collection<Metric> findAll() {
-        return map.values();
+    public Collection<MetricDto> findAll() {
+        try {
+            List<Metric> metricList = metricRepository.findAll();
+            return mapToMetricDtoList(metricList);
+        } catch (Exception e) {
+            log.error("Failed to get all metrics: " + e.getMessage());
+            throw new MetricServiceException("Failed to get all metrics: "
+                                             + e.getMessage());
+        }
     }
 
     /**
@@ -38,70 +48,62 @@ public class MetricService {
      * @return The metric with the specified identifier.
      * @throws DataAccessResourceFailureException if the metric with the specified identifier does not exist.
      */
-    public Metric findById(String id) {
-        var metric = map.get(id);
-
-        if (Objects.nonNull(metric)) {
-            return metric;
-        }
-
-        log.warn("Metric with id: '" + id + "' does not exist!");
-        throw new DataAccessResourceFailureException("Metric with id: '" + id + "' does not exist!");
-    }
-
-    /**
-     * Retrieves a metric by its name.
-     *
-     * @param name The name of the metric to retrieve.
-     * @return The metric with the name, or null if not found.
-     */
-    public Metric findByName(String name) {
-
-        // Iterate through the map entries to find the Metric with the matching name
-        for (Map.Entry<String, Metric> entry : map.entrySet()) {
-            Metric metric = entry.getValue();
-            if (metric.getName().equals(name)) {
-                return metric;
-            }
-        }
-
-        // If no Metric with the specified name is found, return null
-        log.warn("Metric with name: '" + name + "' does not exist!");
-        throw new DataAccessResourceFailureException("Metric with name: '" + name + "' does not exist!");
-    }
-
-
-    /**
-     * Updates an existing metric or inserts a new one if it doesn't exist.
-     *
-     * @param metric The metric to update or insert.
-     */
-    public void update(Metric metric) {
-        if (map.containsKey(metric.getId())) {
-            map.replace(metric.getId(), metric);
-            log.info("MetricService.update " + metric + " was updated!");
-        } else {
-            insert(metric);
+    public Metric findById(Long id) {
+        try {
+            Optional<Metric> optionalMetric = metricRepository.findById(id);
+            return optionalMetric.orElse(null);
+        } catch (Exception e) {
+            log.error("Failed to get metrics by ID: " + e.getMessage());
+            throw new MetricServiceException("Failed to get metrics by ID: "
+                                             + e.getMessage());
         }
     }
 
     /**
-     * Deletes a metric from the ConcurrentHashMap.
+     * Inserts a new metricDto into the MetricRepository.
      *
-     * @param metric The metric to delete.
+     * @param metricDto The metricDto to insert.
      */
-    public void delete(Metric metric) {
-        map.remove(metric.getId());
-        log.info("MetricService.delete " + metric + " was deleted!");
+    public void insert(MetricDto metricDto) {
+        try {
+            Metric metric = new Metric();
+            metric.setName(metricDto.getName());
+            metric.setValue(metricDto.getValue());
+            metric.setUpdated(metricDto.getUpdated());
+
+            metricRepository.save(metric);
+            log.info("Created metric: {}", metricDto);
+        } catch (Exception e) {
+            log.error("Failed to create metric: " + e.getMessage());
+            throw new MetricServiceException("Failed to create metric: "
+                                             + e.getMessage());
+        }
     }
 
     /**
-     * Inserts a new metric into the ConcurrentHashMap.
+     * Utility method to map Metric entities to MetricDto objects.
      *
-     * @param metric The metric to insert.
+     * @param metricList the list of Metric entities
+     * @return a list of MetricDto objects mapped from the Metric entities
      */
-    public void insert(Metric metric) {
-        map.put(metric.getId(), metric);
-        log.info("MetricService.insert " + metric + " was inserted!");
+    private List<MetricDto> mapToMetricDtoList(List<Metric> metricList) {
+        return metricList.stream()
+                .map(this::mapToMetricDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Utility method to map a Metric entity to a MetricDto object.
+     *
+     * @param metric the Metric entity
+     * @return the corresponding MetricDto object
+     */
+    private MetricDto mapToMetricDto(Metric metric) {
+        MetricDto metricDto = new MetricDto();
+        metricDto.setId(metric.getId());
+        metricDto.setName(metric.getName());
+        metricDto.setValue(metric.getValue());
+        metricDto.setUpdated(metric.getUpdated());
+        return metricDto;
     }
 }

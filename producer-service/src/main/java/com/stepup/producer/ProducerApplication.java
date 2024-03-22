@@ -2,14 +2,23 @@ package com.stepup.producer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * The {@code ProducerApplication} class serves as the entry point for the Spring_Kafka producer service application.
- * It is annotated with {@code @SpringBootApplication}, indicating that it is a Spring Boot application.
+ * Main class for the ProducerApplication.
+ * This class is annotated with {@link org.springframework.boot.autoconfigure.SpringBootApplication}
+ * to indicate that it is a Spring Boot application and to enable auto-configuration.
+ * The {@link org.springframework.boot.autoconfigure.SpringBootApplication#exclude()} attribute
+ * is used to exclude the {@link org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration}
+ * class, indicating that the application does not require a data source.
+ *
+ * @see org.springframework.boot.autoconfigure.SpringBootApplication
+ * @see org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+ * @see org.springframework.boot.SpringApplication
  */
 @EnableScheduling
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class ProducerApplication {
 
     /**

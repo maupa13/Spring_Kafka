@@ -1,16 +1,12 @@
 package com.stepup.consumer.web;
 
-import com.stepup.consumer.model.Metric;
 import com.stepup.consumer.service.MetricService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collection;
 
 /**
  * The {@code MetricController} class is a Spring RestController responsible
@@ -29,7 +25,7 @@ public class MetricController {
      * @return ResponseEntity with HTTP status 200 (OK) and a collection of metrics as the response body.
      */
     @GetMapping
-    public ResponseEntity<Collection<Metric>> findAll() {
+    public ResponseEntity<?> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
@@ -38,22 +34,10 @@ public class MetricController {
      *
      * @param id The ID of the metric to retrieve.
      * @return ResponseEntity with HTTP status 200 (OK) and the requested metric as the response body,
-     *         or HTTP status 404 (Not Found) if the metric does not exist.
+     * or HTTP status 404 (Not Found) if the metric does not exist.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Metric> findById(@PathVariable String id) {
+    public ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
-    }
-
-    /**
-     * Retrieves a metric by its name.
-     *
-     * @param name The name of the metric to retrieve.
-     * @return ResponseEntity with HTTP status 200 (OK) and the requested metric as the response body,
-     *         or HTTP status 404 (Not Found) if the metric does not exist.
-     */
-    @GetMapping("/name/")
-    public ResponseEntity<Metric> findByName(@RequestParam String name) {
-        return ResponseEntity.ok(service.findByName(name));
     }
 }

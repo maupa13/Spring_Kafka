@@ -28,7 +28,16 @@ spring:
       spring:
         json:
           type:
-            mapping: Metric:com.stepup.consumer.model.Metric
+            mapping: MetricDto:com.stepup.consumer.model.MetricDto, Metric:com.stepup.consumer.entity.Metric
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spring-kafka
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
 
 # Swagger properties
 springdoc:
@@ -39,4 +48,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: "*"
